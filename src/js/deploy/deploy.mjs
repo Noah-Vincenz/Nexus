@@ -279,7 +279,7 @@ export function waitForReceipt(transactionHash) {
               } else {
                 // Try again in 1 second
                 window.setTimeout(function () {
-                  waitForReceipt(transactionHash);
+                  waitForReceipt(transactionHash).then(resolve).catch(reject);
                 }, 1000);
               }
             }

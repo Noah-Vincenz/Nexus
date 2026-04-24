@@ -1,5 +1,5 @@
 {
-  "name": "test-rust",
+  "name": "nexus",
   "version": "1.0.0",
   "main": "index.mjs",
   "license": "MIT",
@@ -12,12 +12,7 @@
     "start-server": "gulp"
   },
   "dependencies": {
-    "browser-resolve": "^1.11.3",
     "env": "0.0.2",
-    "esmify": "^2.1.1",
-    "gulp": "^4.0.2",
-    "gulp-connect": "^5.7.0",
-    "preset-react": "^1.0.0",
     "react": "^16.8.6"
   },
   "devDependencies": {
@@ -31,8 +26,12 @@
     "babel-loader": "^8.0.6",
     "babel-polyfill": "^6.26.0",
     "babelify": "^10.0.0",
+    "browser-resolve": "^1.11.3",
     "browserify": "^16.3.0",
     "chai": "^4.2.0",
+    "esmify": "^2.1.1",
+    "gulp": "^4.0.2",
+    "gulp-connect": "^5.7.0",
     "jsdom": "15.1.1",
     "jsdom-global": "3.0.2",
     "mocha": "^6.2.0",

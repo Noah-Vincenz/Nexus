@@ -80,7 +80,7 @@ export function createNewContractString(amount, obsArr, recipient, horizonDate, 
     } else {
         if (obsArr.length > 0) {
             for (var i = 0; i < obsArr.length; ++i) {
-                amount = amount + "x" + observablesArr[i];
+                amount = amount + "x" + obsArr[i];
             }
         }
         stringToReturn = "scaleK " + amount + " ( one )";

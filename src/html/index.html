@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- TODO: jQuery 1.12.4 is affected by CVE-2019-11358 — upgrade when feasible -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
   <script src="bundle.js"></script>
-  <meta charset="utf-8">
   <title>Nexus - Financial Smart Contracts</title>
   <link rel="stylesheet" type="text/css" href="main.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -17,7 +19,7 @@
             <div id="holder_container">
                 <p class="p_party">Contract Holder:</p>
                 <input id="holder_address" class="address_input" type="text" placeholder="Contract Holder Address"
-                value="0x004ec07d2329997267Ec62b4166639513386F32E" maxlength="42"><br>
+                maxlength="42"><br>
                 <p class="p_balance" id="holder_balance_p">Balance: 0ETH</p>
                 <button class="button" id = "deposit_button1" type="button" onclick="callDepositFunction(1)">deposit</button>
             </div>
@@ -30,7 +32,7 @@
             <div id="counter_party_container">
                 <p class="p_party">Contract Counter-Party:</p>
                 <input id="counter_party_address" class="address_input" type="text" placeholder="Contract Counter-Party Address"
-                value="0x7f023262356b002a4b7deb7ce057eb8b1aabb427" maxlength="42"><br>
+                maxlength="42"><br>
                 <p class="p_balance" id="counter_party_balance_p">Balance: 0ETH</p>
                 <button class="button" id = "deposit_button2" type="button" onclick="callDepositFunction(2)">deposit</button>
             </div>
@@ -40,7 +42,9 @@
             <option value="0x8ce40d9956e7b8a89a1d73f4d4850c760ea20a56">0x8ce40d9956e7b8a89a1d73f4d4850c760ea20a56</option>
             <option value="0xc90bc8ff4387fe14cdd0934ef9935be590cb83ca">0xc90bc8ff4387fe14cdd0934ef9935be590cb83ca</option>
             <option value="0xa03cbbea9891d7961ed23fd965b6ad3109c36a30">0xa03cbbea9891d7961ed23fd965b6ad3109c36a30</option>
+            <!-- simulated demo oracle (not a valid Ethereum address) -->
             <option value="0x90a3coyea9891d7961edo78h96b6ad3109c3659b">0x90a3coyea9891d7961edo78h96b6ad3109c3659b</option>
+            <!-- simulated demo oracle (not a valid Ethereum address) -->
             <option value="0xa89fbjs0033nkkklizqp04bj4jb5bjxxk4nb33n4">0xa89fbjs0033nkkklizqp04bj4jb5bjxxk4nb33n4</option>
         </select>
         <p class="status" id="create_contract_status"></p>
@@ -67,7 +71,6 @@
       <div id="button_choices_container"></div>
       <p id="p_section_header">All Contracts:</p>
       <div id="tableContainer">
-          <p>
               <table id="my_table">
                   <thead id="table_head">
                       <tr>
@@ -84,7 +87,6 @@
                   <tbody id="table_body">
                   </tbody>
               </table>
-          </p>
       </div>
     </div>
   </div>

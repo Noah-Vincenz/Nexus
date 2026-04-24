@@ -31,7 +31,7 @@ import {
   beforeCurrentDate,
   computeDateString,
   concatenate
-} from "./stringmanipulation.mjs";
+} from "./stringManipulation.mjs";
 
 import {
   Contract,
@@ -64,10 +64,8 @@ import {
 } from "./oracles.mjs";
 
 import {
-  sleep,
   occurrences,
-  isNumeric,
-  printStack
+  isNumeric
 } from "./generalfunctions.mjs"
 
 var numberOfSubContracts = 0,
@@ -185,7 +183,7 @@ global.addDefinition = function(inputString) {
             document.getElementById("add_definitions_status").innerHTML = "Please provide a valid definition.";
             throw new Error("Please provide a valid definition.");
         }
-        document.getElementById("input_added_textarea").innerHTML = "";
+        document.getElementById("input_added_textarea").value = "";
         var strArr = inputString.split("="),
             part1 = rTrimWhiteSpace(strArr[0]),
             part2 = trimSemiColon(lTrimWhiteSpace(strArr[1])),
@@ -210,7 +208,7 @@ global.addDefinition = function(inputString) {
         }
         for (var [key, value] of definitionsMap) { // need to do this in order to allow overwriting of definitions
             var valueArr = value.split("=");
-            document.getElementById("input_added_textarea").innerHTML += (key + ": " + valueArr[0] + " = " + valueArr[1] + "\n");
+            document.getElementById("input_added_textarea").value += (key + ": " + valueArr[0] + " = " + valueArr[1] + "\n");
         }
     } catch(e) {
         console.log("Invalid definition provided.")
@@ -225,7 +223,7 @@ global.addDefinition = function(inputString) {
  */
 export function nonExistingTerm(term) {
     if (term !== "give" && term !== "truncate" && term !== "get" && term !== "one"
-    && term !== "zero" && term !== "scaleK" && term !== "one" && !COMPARISONOPERATOR(term)
+    && term !== "zero" && term !== "scaleK" && !COMPARISONOPERATOR(term)
     && term !== "&&" && term !== "if" && term !== "||" && !isNumeric(term) && term !== "(" && term !== ")"
     && !isDate(lTrimDoubleQuotes(rTrimDoubleQuotes(term))) && term !== "else" && term !== "}"
     && term !== "{" && term !== "and" && term !== "or" && !observablesArr.includes(term)) {
@@ -430,7 +428,7 @@ function update() {
                 if (contract.toBeExecutedAtHorizon === "yes") { // contract contains 'get' - must be executed now
                     executeSingleContract(contract);
                 } else { // contract just contains 'truncate' and not 'get'
-                    document.getElementById("td_status_" + contract.id).innerHTML = "expired";
+                    document.getElementById("td_status_" + contract.id).textContent = "expired";
                     deleteFromSuperContracts(superContractsMap, superContractId, contract);
                 }
             }
@@ -1270,7 +1268,7 @@ function updateValuationValue(id) {
         month = padNumber(document.getElementById("month_select_" + id).value),
         year = document.getElementById("year_select_" + id).value,
         c = getAllSubcontracts(id);
-    document.getElementById("p_value_" + id).innerHTML = getValue(c, day + "/" + month + "/" + year + "-" + "12:00:00").toString() + "ETH";
+    document.getElementById("p_value_" + id).textContent = (getValue(c, day + "/" + month + "/" + year + "-" + "12:00:00") ?? 0).toString() + "ETH";
 }
 
 /**
@@ -1313,8 +1311,8 @@ function updateSelectableDaysFromMonth(selectedMonth, id) {
         }
     }
     else if (selectedMonth === "2") {
-        if (selectYear === "2020" || selectYear === "2024" || selectYear === "2028"
-          || selectYear === "2032" || selectYear === "2036" || selectYear === "2040") { // leap year - 29 days in Feb
+        if (selectYear.value === "2020" || selectYear.value === "2024" || selectYear.value === "2028"
+          || selectYear.value === "2032" || selectYear.value === "2036" || selectYear.value === "2040") { // leap year - 29 days in Feb
             if (parseInt(selectDay.value) > 29) {
                 selectDay.value = 29;
             }
@@ -1678,10 +1676,10 @@ function createContractObject(inputString) {
         ++numberOfSubContracts;
         if (horizonDate !== "infinite" && beforeCurrentDate(contract.horizonDate, "")) {
             // add expired label
-            document.getElementById("td_status_" + contract.id).innerHTML = "expired";
+            document.getElementById("td_status_" + contract.id).textContent = "expired";
         } else {
             addToSuperContracts(superContractsMap, numberOfContracts.toString(), contract); // contract is only added to pending contracts map if it is still valid
-            document.getElementById("td_status_" + contract.id).innerHTML = "waiting to be executed";
+            document.getElementById("td_status_" + contract.id).textContent = "waiting to be executed";
         }
         addSuperContractRow();
     } else {
@@ -1799,15 +1797,15 @@ function executeSingleContract(contract) {
     }
     holderAddress().then(holderAddress => {
         counterPartyAddress().then(counterPartyAddress => {
-            if (contract.recipient == 0) { // owner receives
+            if (contract.recipient === 0) { // owner receives
                 createMoveFile(counterPartyAddress, holderAddress, parseFloat(contract.amount));
                 callTransferFunction(contract, counterPartyAddress, holderAddress);
             } else { // counter party receives
                 createMoveFile(holderAddress, counterPartyAddress, parseFloat(contract.amount));
                 callTransferFunction(contract, holderAddress, counterPartyAddress);
             }
-            if (document.getElementById("td_status_" + contract.id).innerHTML !== "successful") {
-                document.getElementById("td_status_" + contract.id).innerHTML = "not accepted by user";
+            if (document.getElementById("td_status_" + contract.id).textContent !== "successful") {
+                document.getElementById("td_status_" + contract.id).textContent = "not accepted by user";
             }
         });
     });
@@ -1826,15 +1824,15 @@ function callTransferFunction(contract, fromAddress, toAddress) {
                 // do not need to watch for transfer event as we do checks here.. watching the event may cause delays
                 waitForReceipt(transferTxHash).then( _ => {
                     console.log(fromAddress + " has transferred " + contract.amount + " Ether to " + toAddress);
-                    document.getElementById("td_status_" + contract.id).innerHTML = "successful";
+                    document.getElementById("td_status_" + contract.id).textContent = "successful";
                     deleteFromSuperContracts(superContractsMap, contract.id.split(".")[0], contract);
                     retrieveBalances();
                 });
             });
         } else {
-            document.getElementById("td_status_" + contract.id).innerHTML = "insufficient funds";
+            document.getElementById("td_status_" + contract.id).textContent = "insufficient funds";
             if (beforeCurrentDate(contract.horizonDate, "")) {
-                document.getElementById("td_status_" + contract.id).innerHTML = "expired";
+                document.getElementById("td_status_" + contract.id).textContent = "expired";
                 deleteFromSuperContracts(superContractsMap, contract.id.split(".")[0], contract);
             }
         }
@@ -1935,18 +1933,18 @@ function createTableRow(contract) {
     tr.className = "standard_row";
     var td;
     tr.appendChild(td = document.createElement("td"));
-    td.innerHTML = contract.id;
+    td.textContent = contract.id;
     tr.appendChild(td = document.createElement("td"));
-    td.innerHTML = changeDateFormatBack(contract.contractString);
+    td.textContent = changeDateFormatBack(contract.contractString);
     tr.appendChild(td = document.createElement("td"));
-    td.innerHTML = changeDateFormatBack(contract.meaningOfContractString);
+    td.textContent = changeDateFormatBack(contract.meaningOfContractString);
     tr.appendChild(td = document.createElement("td"));
-    td.innerHTML = changeDateFormatBack(contract.horizonDate);
+    td.textContent = changeDateFormatBack(contract.horizonDate);
     tr.appendChild(td = document.createElement("td"));
-    td.innerHTML = contract.toBeExecutedAtHorizon;
+    td.textContent = contract.toBeExecutedAtHorizon;
     tr.appendChild(td = document.createElement("td"));
     td.id = "td_status_" + contract.id;
-    td.innerHTML = contract.status;
+    td.textContent = contract.status;
 }
 
 /**

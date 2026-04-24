@@ -377,7 +377,7 @@ export function sameDayAsCurrentDate(contractHorizon, horizonToCheck) {
         contractMonth = contractHorizon.split("-")[0].split("/")[1],
         contractYear = contractHorizon.split("-")[0].split("/")[2];
     if (horizonToCheck === "") {
-        var todayDay = new Date().getDate().toString(),
+        var todayDay = padNumber(new Date().getDate().toString()),
             todayMonth = new Date().getMonth(),
             todayYear = new Date().getFullYear().toString();
         if (contractDay === todayDay && contractMonth === padNumber((todayMonth + 1).toString()) && contractYear === todayYear) {
@@ -498,7 +498,7 @@ export function computeDateString(dateString) {
         timeArr = horizonArr[1].split(":"),
         finalDateString = dateArr[2] + "-" + dateArr[1] + "-"
     + dateArr[0] + "T" + timeArr[0] + ":" + timeArr[1] + ":"
-    + timeArr[2] + "+01:00"; // adding 15 seconds to the contract's expiry date to allow it to execute
+    + timeArr[2] + "+00:00"; // use UTC for financial contract date comparisons
     return finalDateString;
 }
 

@@ -18,7 +18,6 @@ function copyHTMLFiles() {
 //Convert ES6 code in all js files in src/js folder and copy to
 //build folder as bundle.js
 function build() {
-  // body omitted
   return browserify({
       entries: ["./src/js/index.mjs"]
   })

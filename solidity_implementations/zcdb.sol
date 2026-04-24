@@ -3,11 +3,11 @@ pragma solidity >=0.4.22 <0.6.0;
 /*
 * @author danrobdean https://github.com/danrobdean
 */
-contract EuroOption {
+contract ZeroCouponBond {
 
     // Static values
-    int256 MAX_INT256 = int256(~(uint256(1) << 255));
-    int256 MIN_INT256 = int256(uint256(1) << 255);
+    int256 constant MAX_INT256 = int256(~(uint256(1) << 255));
+    int256 constant MIN_INT256 = int256(uint256(1) << 255);
     uint256 HORIZON_UNIX = 1577880000;
 
     // The contract holder
@@ -72,20 +72,14 @@ contract EuroOption {
     function acquire() public onlyHolder() {
         require(
             !acquired,
-            "This function can only be called before
-              acquisition."
+            "This function can only be called before acquisition."
         );
         require(
-            now <= HORIZON_UNIX,
-            "This contract can only be acquired until
-              01/01/2020 12:00:00 UTC."
+            block.timestamp >= HORIZON_UNIX,
+            "This contract can only be acquired from 01/01/2020 12:00:00 UTC."
         );
 
         acquired = true;
-
-        if (now < HORIZON_UNIX) {
-            return;
-        }
 
         // Update balances
         transferToHolder(100);
@@ -104,7 +98,7 @@ contract EuroOption {
     }
 
     // Withdraw Ether from the contract
-    function withdraw(uint64 amount) public onlyParties() {
+    function withdraw(uint256 amount) public onlyParties() {
         require(
             address(this).balance > 0,
             "Contract does not have enough funds."
@@ -114,24 +108,25 @@ contract EuroOption {
             "The caller does not have enough stake."
         );
 
-        uint64 finalAmount = amount;
+        uint256 finalAmount = amount;
 
         // Clamp withdrawal amount to total contract balance
         if (address(this).balance < finalAmount) {
-            finalAmount = uint64(address(this).balance);
+            finalAmount = uint256(address(this).balance);
         }
 
         // Clamp withdrawal amount to party's balance
         if (stakes[msg.sender] < finalAmount) {
-            finalAmount = uint64(stakes[msg.sender]);
+            finalAmount = uint256(stakes[msg.sender]);
         }
 
         // Adjust balance first to prevent re-entrancy bugs
         stakes[msg.sender] = safeSubSigned(stakes[msg.sender],
           int256(finalAmount));
 
-        // Send Ether (with no gas)
-        msg.sender.call.value(finalAmount).gas(0);
+        // send Ether to the caller
+        (bool success, ) = msg.sender.call.value(finalAmount)("");
+        require(success, "Transfer failed.");
     }
 
     // Transfers the given amount from the holder to the counter-party
@@ -142,7 +137,7 @@ contract EuroOption {
     }
 
     // Add two signed integers if no overflow or underflow can occur
-    function safeAddSigned(int256 a, int256 b) private view
+    function safeAddSigned(int256 a, int256 b) private pure
       returns (int256) {
         require(
             (b >= 0 && a <= MAX_INT256 - b) ||
@@ -154,7 +149,7 @@ contract EuroOption {
     }
 
     // Subtract one signed integer from another if no overflow or underflow can occur
-    function safeSubSigned(int256 a, int256 b) private view
+    function safeSubSigned(int256 a, int256 b) private pure
       returns (int256) {
         require(
             b != MIN_INT256,

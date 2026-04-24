@@ -20,7 +20,7 @@ pub fn deploy() {
 #[no_mangle]
 pub fn call() {
 	let mut endpoint = smart_contract::SmartContractEndpoint::new(smart_contract::SmartContractInstance{});
-    ret(&endpoint.dispatch(&input()));
+	ret(&endpoint.dispatch(&input()));
 }
 
 pub mod smart_contract {
@@ -51,12 +51,12 @@ pub mod smart_contract {
 		#[constant]
 		fn counterPartyAddress(&mut self) -> H256;
 		/// Transfer between two accounts
-        fn transfer(&mut self, _from: Address, _to: Address, _amount: U256);
+		fn transfer(&mut self, _from: Address, _to: Address, _amount: U256);
 		#[payable]
 		fn depositCollateral(&mut self, amount: U256);
 		/// Event declaration
 		#[event]
-        fn TransferEvent(&mut self, result: i32);
+		fn TransferEvent(&mut self, result: i32);
 	}
 
 	pub struct SmartContractInstance;
@@ -88,28 +88,31 @@ pub mod smart_contract {
 	    }
 
 		fn transfer(&mut self, from: Address, to: Address, amount: U256) {
-            let senderBalance = read_balance(&from);
-            let recipientBalance = read_balance(&to);
+			// only the `from` address may initiate a transfer
+			assert!(sender() == from, "Unauthorized: caller must be the sender");
+			let senderBalance = read_balance(&from);
+			let recipientBalance = read_balance(&to);
 
-            if senderBalance < amount {
+			if senderBalance < amount {
 				self.TransferEvent(0);
 			} else if to == from {
 				self.TransferEvent(1);
 			} else if amount == 0.into() {
 				self.TransferEvent(2);
 			} else {
-                let new_sender_balance = senderBalance - amount;
-                let new_recipient_balance = recipientBalance + amount;
-                write(&balance_key(&from), &new_sender_balance.into());
-                write(&balance_key(&to), &new_recipient_balance.into());
-				self.TransferEvent(2);
-            }
-        }
+				let new_sender_balance = senderBalance - amount;
+				let new_recipient_balance = recipientBalance + amount;
+				write(&balance_key(&from), &new_sender_balance.into());
+				write(&balance_key(&to), &new_recipient_balance.into());
+				self.TransferEvent(3);
+			}
+		}
 
-		fn depositCollateral(&mut self, amount: U256) {
+		fn depositCollateral(&mut self, _amount: U256) {
 			let sender = sender();
+			let actual_amount = pwasm_ethereum::value();
 			let sender_balance = read_balance(&sender);
-            let new_sender_balance = sender_balance + amount;
+			let new_sender_balance = sender_balance + actual_amount;
 			write(&balance_key(&sender), &new_sender_balance.into());
 		}
 
